@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudClaw 本地智能助手</title>
+    <style>
+        /* 简单样式，保证页面整洁易操作 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", Arial, sans-serif;
+        }
+        body {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-area {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: none;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result-area {
+            margin-top: 30px;
+        }
+        .result-area h3 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        #result {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+        .status {
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CloudClaw 本地智能助手</h1>
+        
+        <!-- 指令输入区域 -->
+        <div class="input-area">
+            <textarea id="commandInput" placeholder="请输入你要执行的指令，例如：
+1. 读取文件：帮我读取C:/test.txt文件内容
+2. 写入文件：帮我往C:/test.txt写入内容'测试内容'
+3. 数值计算：计算100 + 200
+4. 字符串拼接：把'你好'和'世界'拼接，分隔符为逗号"></textarea>
+            <br>
+            <button onclick="sendCommand()">执行指令</button>
+        </div>
+        
+        <!-- 结果展示区域 -->
+        <div class="result-area">
+            <h3>执行结果：</h3>
+            <div id="result">等待执行...</div>
+        </div>
+        
+        <div class="status">服务地址：http://localhost:8000 | 健康检查：http://localhost:8000/health</div>
+    </div>
+
+    <script>
+        // 简单的指令发送函数（模拟调用后端接口）
+        async function sendCommand() {
+            const input = document.getElementById('commandInput').value.trim();
+            const resultEl = document.getElementById('result');
+            
+            if (!input) {
+                resultEl.textContent = "请输入有效指令！";
+                return;
+            }
+            
+            resultEl.textContent = "正在处理...";
+            
+            try {
+                // 模拟调用后端API（实际需替换为真实接口地址）
+                const response = await fetch('http://localhost:8000/api/tool/execute', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        command: input,
+                        userId: "user_001"
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.code === 200) {
+                    resultEl.textContent = JSON.stringify(data.data, null, 2);
+                } else {
+                    resultEl.textContent = `执行失败：${data.msg}`;
+                }
+            } catch (error) {
+                resultEl.textContent = `接口调用失败：${error.message}
+请先启动后端服务（运行backend/main.py）`;
+            }
+        }
+    </script>
+</body>
+</html>
